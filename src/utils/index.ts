@@ -15,7 +15,7 @@ type SVGMatrix = [number, number, number, number, number, number];
  * |b1 d1 f1| x |b2 d2 f2| = |(b1*a2+d1*b2) (b1*c2+d1*d2) (b1*e2+d1*f2+f1)|
  * |0  0  1 |   |0  0  1 |   |0             0             1             |
  */
-function multiplyMatrices(m1: SVGMatrix, m2: SVGMatrix): SVGMatrix {
+export function multiplyMatrices(m1: SVGMatrix, m2: SVGMatrix): SVGMatrix {
   return [
     m1[0] * m2[0] + m1[2] * m2[1],      // a
     m1[1] * m2[0] + m1[3] * m2[1],      // b
@@ -129,6 +129,10 @@ export function svgTransformOriginMatrix(
   return `matrix(${finalMatrix.join(',')})`;
 }
 
+
+export default function svgMatrixToMatrixString(svgMatrix: SVGMatrix): string {
+  return `matrix(${svgMatrix.join(',')})`;
+}
 /*
 // 示例用法 (假设你在 HTML 中有 SVG 元素):
 // HTML:

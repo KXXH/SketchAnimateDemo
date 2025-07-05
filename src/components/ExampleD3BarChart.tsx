@@ -1,19 +1,8 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import {
-  animate,
-  createScope,
-  createTimeline,
-  Scope,
-  Timeline,
-  utils,
-  waapi,
-} from "animejs";
-import {
-  createScaleMatrix,
-  createTranslateMatrix,
-  svgTransformOriginMatrix,
-} from "../utils";
+import { createScope, Scope } from "animejs";
+import { pulse } from "../animations/emphasis/pulse";
+import { spin } from "../animations/cohering/spin";
 
 const ExampleD3BarChart: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -75,8 +64,8 @@ const ExampleD3BarChart: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!svgRef.current) return;
     scope.current = createScope({ root: svgRef }).add((self) => {
-      const tl = createTimeline();
       const barSelectors = "rect";
       const barElems = Array.from(
         self.root.querySelectorAll(barSelectors)
@@ -88,32 +77,12 @@ const ExampleD3BarChart: React.FC = () => {
 
       const idx = d3.randomInt(barElems.length)();
       const barElem = barElems[idx];
-      // tl.sync(
-      //   waapi.animate(barElem, {
-      //     transform: svgTransformOriginMatrix(
-      //       barElem,
-      //       createScaleMatrix(1.1, 1.1),
-      //       "50% 100%"
-      //     ),
-      //     loop: 5,
-      //     alternate: true,
-      //     duration: 300,
-      //     delay: 200,
-      //   })
-      // );
-      waapi.animate(barElem, {
-        transform: svgTransformOriginMatrix(
-          barElem,
-          createScaleMatrix(1.1, 1.1),
-          "50% 100%"
-        ),
-        loop: 5,
-        alternate: true,
-      duration: 300,
 
-
-        delay: 200,
-      })
+      // pulse(barElem);
+      spin(svgRef.current!, {
+        rotate: 90,
+        scale: 1.5,
+      });
     });
     return () => scope.current?.revert();
   }, []);
