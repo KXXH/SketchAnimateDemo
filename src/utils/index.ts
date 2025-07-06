@@ -2,7 +2,7 @@
  * 定义一个 2x3 矩阵的类型。
  * 对应 SVG 的 matrix(a, b, c, d, e, f)
  */
-type SVGMatrix = [number, number, number, number, number, number];
+type SVGMatrix = [number, number, number, number, number, number]
 
 /**
  * 矩阵乘法函数 (2x3 矩阵)
@@ -17,13 +17,13 @@ type SVGMatrix = [number, number, number, number, number, number];
  */
 export function multiplyMatrices(m1: SVGMatrix, m2: SVGMatrix): SVGMatrix {
   return [
-    m1[0] * m2[0] + m1[2] * m2[1],      // a
-    m1[1] * m2[0] + m1[3] * m2[1],      // b
-    m1[0] * m2[2] + m1[2] * m2[3],      // c
-    m1[1] * m2[2] + m1[3] * m2[3],      // d
+    m1[0] * m2[0] + m1[2] * m2[1], // a
+    m1[1] * m2[0] + m1[3] * m2[1], // b
+    m1[0] * m2[2] + m1[2] * m2[3], // c
+    m1[1] * m2[2] + m1[3] * m2[3], // d
     m1[0] * m2[4] + m1[2] * m2[5] + m1[4], // e
-    m1[1] * m2[4] + m1[3] * m2[5] + m1[5]  // f
-  ];
+    m1[1] * m2[4] + m1[3] * m2[5] + m1[5], // f
+  ]
 }
 
 /**
@@ -33,7 +33,7 @@ export function multiplyMatrices(m1: SVGMatrix, m2: SVGMatrix): SVGMatrix {
  * @returns matrix 形式
  */
 export function createTranslateMatrix(tx: number, ty: number): SVGMatrix {
-  return [1, 0, 0, 1, tx, ty];
+  return [1, 0, 0, 1, tx, ty]
 }
 
 /**
@@ -43,7 +43,7 @@ export function createTranslateMatrix(tx: number, ty: number): SVGMatrix {
  * @returns matrix 形式
  */
 export function createScaleMatrix(sx: number, sy: number = sx): SVGMatrix {
-  return [sx, 0, 0, sy, 0, 0];
+  return [sx, 0, 0, sy, 0, 0]
 }
 
 /**
@@ -52,10 +52,10 @@ export function createScaleMatrix(sx: number, sy: number = sx): SVGMatrix {
  * @returns matrix 形式
  */
 export function createRotateMatrix(angle: number): SVGMatrix {
-  const rad = angle * Math.PI / 180;
-  const cos = Math.cos(rad);
-  const sin = Math.sin(rad);
-  return [cos, sin, -sin, cos, 0, 0];
+  const rad = angle * Math.PI / 180
+  const cos = Math.cos(rad)
+  const sin = Math.sin(rad)
+  return [cos, sin, -sin, cos, 0, 0]
 }
 
 /**
@@ -64,37 +64,40 @@ export function createRotateMatrix(angle: number): SVGMatrix {
  * @param originStr transform-origin 字符串 (e.g., "50% 50%", "100px 200px", "0 100%")
  * @returns {x: number, y: number} 绝对坐标对象
  */
-function calculateSvgOriginAbsoluteCoords(svgElement: SVGGraphicsElement, originStr: string): { x: number; y: number } {
-  const bbox = svgElement.getBBox();
-  let originX = 0;
-  let originY = 0;
+function calculateSvgOriginAbsoluteCoords(svgElement: SVGGraphicsElement, originStr: string): { x: number, y: number } {
+  const bbox = svgElement.getBBox()
+  let originX = 0
+  let originY = 0
 
-  const parts = originStr.split(' ').map(s => s.trim());
+  const parts = originStr.split(' ').map(s => s.trim())
   // 如果只给了一个值，Y轴也用这个值
-  const xPart = parts[0];
-  const yPart = parts.length > 1 ? parts[1] : xPart;
+  const xPart = parts[0]
+  const yPart = parts.length > 1 ? parts[1] : xPart
 
   // 解析 X 坐标
   if (xPart.endsWith('%')) {
-    originX = bbox.x + bbox.width * (parseFloat(xPart) / 100);
-  } else if (xPart.endsWith('px')) {
-    originX = bbox.x + parseFloat(xPart);
-  } else { // 默认用户单位
-    originX = bbox.x + parseFloat(xPart);
+    originX = bbox.x + bbox.width * (Number.parseFloat(xPart) / 100)
+  }
+  else if (xPart.endsWith('px')) {
+    originX = bbox.x + Number.parseFloat(xPart)
+  }
+  else { // 默认用户单位
+    originX = bbox.x + Number.parseFloat(xPart)
   }
 
   // 解析 Y 坐标
   if (yPart.endsWith('%')) {
-    originY = bbox.y + bbox.height * (parseFloat(yPart) / 100);
-  } else if (yPart.endsWith('px')) {
-    originY = bbox.y + parseFloat(yPart);
-  } else { // 默认用户单位
-    originY = bbox.y + parseFloat(yPart);
+    originY = bbox.y + bbox.height * (Number.parseFloat(yPart) / 100)
+  }
+  else if (yPart.endsWith('px')) {
+    originY = bbox.y + Number.parseFloat(yPart)
+  }
+  else { // 默认用户单位
+    originY = bbox.y + Number.parseFloat(yPart)
   }
 
-  return { x: originX, y: originY };
+  return { x: originX, y: originY }
 }
-
 
 /**
  * 辅助函数，生成 SVG 元素的 transform 字符串，支持自定义 transform-origin 并以 matrix 形式返回。
@@ -107,31 +110,29 @@ function calculateSvgOriginAbsoluteCoords(svgElement: SVGGraphicsElement, origin
 export function svgTransformOriginMatrix(
   svgElement: SVGGraphicsElement,
   transformMatrix: SVGMatrix, // 期望传入一个 SVGMatrix
-  originString: string // e.g., "50% 50%" or "0 100%" or "100 200"
+  originString: string, // e.g., "50% 50%" or "0 100%" or "100 200"
 ): string {
-  const { x: cx, y: cy } = calculateSvgOriginAbsoluteCoords(svgElement, originString);
+  const { x: cx, y: cy } = calculateSvgOriginAbsoluteCoords(svgElement, originString)
 
-  console.log(cx, cy);
   // 1. 平移到原点
-  const translateToOrigin = createTranslateMatrix(-cx, -cy);
+  const translateToOrigin = createTranslateMatrix(-cx, -cy)
   // 2. 应用变换 (用户传入的 transformMatrix)
   // 3. 平移回来
-  const translateBack = createTranslateMatrix(cx, cy);
+  const translateBack = createTranslateMatrix(cx, cy)
 
   // 合并矩阵: M_final = M_translate_to_origin * M_transform * M_translate_back_from_origin
   // 注意矩阵乘法的顺序，从右到左应用
   // m = translateBack * (transformMatrix * translateToOrigin)
-  const tempMatrix = multiplyMatrices(transformMatrix, translateToOrigin);
+  const tempMatrix = multiplyMatrices(transformMatrix, translateToOrigin)
   // const tempMatrix = transformMatrix;
-  const finalMatrix = multiplyMatrices(translateBack, tempMatrix);
+  const finalMatrix = multiplyMatrices(translateBack, tempMatrix)
 
   // 将矩阵转换为 SVG matrix() 字符串格式
-  return `matrix(${finalMatrix.join(',')})`;
+  return `matrix(${finalMatrix.join(',')})`
 }
 
-
 export default function svgMatrixToMatrixString(svgMatrix: SVGMatrix): string {
-  return `matrix(${svgMatrix.join(',')})`;
+  return `matrix(${svgMatrix.join(',')})`
 }
 /*
 // 示例用法 (假设你在 HTML 中有 SVG 元素):
