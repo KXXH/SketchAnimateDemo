@@ -1,13 +1,14 @@
-import { eases, waapi, type EasingParam } from "animejs";
-import { createScaleMatrix, svgTransformOriginMatrix } from "../../utils";
+import type { EasingParam } from 'animejs'
+import { eases, waapi } from 'animejs'
+import { createScaleMatrix, svgTransformOriginMatrix } from '../../utils'
 
 export function pulse(targets: SVGGraphicsElement, opts?: {
-  sx?: number;
-  sy?: number;
-  duration?: number;
-  delay?: number;
-  repeatCount?: number;
-  ease?: EasingParam;
+  sx?: number
+  sy?: number
+  duration?: number
+  delay?: number
+  repeatCount?: number
+  ease?: EasingParam
 }) {
   const {
     sx = 1.1,
@@ -16,18 +17,18 @@ export function pulse(targets: SVGGraphicsElement, opts?: {
     delay = 0,
     repeatCount = 3,
     ease = eases.out(2),
-  } = opts ?? {};
+  } = opts ?? {}
 
   return waapi.animate(targets, {
     transform: svgTransformOriginMatrix(
       targets,
       createScaleMatrix(sx, sy),
-      "50% 100%"
+      '50% 100%',
     ),
     loop: repeatCount * 2 - 1,
     alternate: true,
-    duration: duration,
-    delay: delay,
-    ease
+    duration,
+    delay,
+    ease,
   })
 }
