@@ -32,15 +32,56 @@ function timelineToArray(timeline: anime.Timeline): ITimeline[] {
 }
 
 const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => {
+  interface IRowTimeline extends ITimeline {
+    /** y轴上的行号，从0开始 */
+    row: number
+  }
+
+  // 函数：检测重叠并分配行
+  const distributeTimelinesIntoRows = (timelines: ITimeline[]): IRowTimeline[] => {
+    // 按开始时间排序时间线，这有助于简化重叠检测
+    const sortedTimelines = [...timelines].sort((a, b) => a.start - b.start)
+
+    // 存储每行的结束时间，用于判断当前行是否可以放置新的时间线
+    const rows: { endTime: number, timelines: IRowTimeline[] }[] = []
+    const assignedTimelines: IRowTimeline[] = []
+
+    sortedTimelines.forEach((timeline) => {
+      let assignedRow = -1
+      // 尝试找到一个现有行来放置当前时间线
+      for (let i = 0; i < rows.length; i++) {
+        // 如果当前时间线的开始时间晚于或等于该行的结束时间，则可以放置在该行
+        if (timeline.start >= rows[i].endTime) {
+          assignedRow = i
+          break
+        }
+      }
+
+      // 如果没有找到合适的行，则创建新行
+      if (assignedRow === -1) {
+        assignedRow = rows.length
+        rows.push({ endTime: 0, timelines: [] })
+      }
+
+      // 更新该行的结束时间
+      rows[assignedRow].endTime = timeline.end
+      // 将时间线分配到该行
+      const timelineWithRow = { ...timeline, row: assignedRow }
+      rows[assignedRow].timelines.push(timelineWithRow)
+      assignedTimelines.push(timelineWithRow)
+    })
+
+    return assignedTimelines
+  }
   const containerRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<any>(null)
-  const [timeline, setTimeline] = useState<ITimeline[]>([])
   const [visualTimeline, setVisualTimeline] = useState<
-    Array<ITimeline & { left: string, width: string, color: string }>
+    Array<IRowTimeline & { left: string, width: string, color: string }>
   >([])
   const [isDragging, setIsDragging] = useState(false)
   const timelineContainerRef = useRef<HTMLDivElement>(null)
   const [currentTimePosition, setCurrentTimePosition] = useState('0%')
+  const [maxRow, setMaxRow] = useState(0) // 用于存储最大行数
 
   useEffect(() => {
     if (!containerRef.current || !timelineContainerRef.current)
@@ -106,9 +147,9 @@ const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => 
 
     animationRef.current = timeline
     const rawTimeline = timelineToArray(timeline)
-    setTimeline(rawTimeline)
+    const processedTimelines = distributeTimelinesIntoRows(rawTimeline)
 
-    const totalDuration = rawTimeline.reduce((max, item) => Math.max(max, item.end), 0)
+    const totalDuration = processedTimelines.reduce((max, item) => Math.max(max, item.end), 0)
     const colors = [
       '#FF5733',
       '#33FF57',
@@ -120,7 +161,7 @@ const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => 
       '#8FFF33',
     ]
 
-    const visualData = rawTimeline.map((item, index) => {
+    const visualData = processedTimelines.map((item, index) => {
       const left = (item.start / totalDuration) * 100
       const width = ((item.end - item.start) / totalDuration) * 100
       return {
@@ -130,7 +171,13 @@ const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => 
         color: colors[index % colors.length],
       }
     })
+    // 计算最大行数，用于设置时间轴容器的高度
+    // const maxRow = processedTimelines.reduce((max, item) => Math.max(max, item.row), 0)
+    // 根据实际行数调整时间轴容器的高度
+
     setVisualTimeline(visualData)
+    const calculatedMaxRow = visualData.reduce((max, item) => Math.max(max, item.row), 0)
+    setMaxRow(calculatedMaxRow)
 
     // 清理函数
     return () => {
@@ -280,16 +327,18 @@ const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => 
 
       <div
         ref={timelineContainerRef}
-        className="relative h-10 w-full cursor-pointer border border-gray-300"
+        className="relative w-full cursor-pointer border border-gray-300"
+        style={{ height: `${(maxRow + 1) * 24 + 10}px` }} // 根据最大行数动态设置高度，每行高24px，加上10px的padding
       >
         {visualTimeline.map((item, index) => (
           <div
             key={index}
-            className="absolute h-full border-rounded border-solid opacity-70"
+            className="absolute box-border h-6 border-rounded border-solid opacity-70"
             style={{
               left: item.left,
               width: item.width,
               backgroundColor: item.color,
+              top: `${item.row * 24}px`, // 根据行号设置垂直位置
             }}
           >
           </div>
