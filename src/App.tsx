@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { spin } from './animations/cohering/spin'
 import { pulse } from './animations/emphasis/pulse'
 import { shatter } from './animations/twist/shatter'
+import ComplexTimeline from './components/ComplexTimeline'
 import ExampleD3BarChart from './components/ExampleD3BarChart'
 
 function App() {
@@ -64,6 +65,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-dark-900 text-white">
+      {/* <Magnifier /> */}
+      <ComplexTimeline />
       <button
         className="mb-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         onClick={handleSpinClick}

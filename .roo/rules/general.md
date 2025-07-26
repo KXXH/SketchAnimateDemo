@@ -11,3 +11,7 @@
 
 ## 4. 提交信息规范
 - 遵循 Conventional Commits 规范。
+
+## 5. animejs 动画
+- 使用 animejs 进行动画效果。
+- 时间线动画添加：`timeline.add(targets, parameters, position);`
