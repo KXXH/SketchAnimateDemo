@@ -296,7 +296,7 @@ const ComplexTimeline: React.FC<ComplexTimelineProps> = ({ className = '' }) => 
         ))}
         <div
           className="absolute bottom-0 top-0 z-10 w-0.5 bg-red-500"
-          style={{ left: currentTimePosition }}
+          style={{ left: currentTimePosition, mixBlendMode: 'difference' }}
         >
         </div>
       </div>
